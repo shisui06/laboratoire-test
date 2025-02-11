@@ -2,21 +2,22 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
-const USERS_FILE = "./users.json";
+const USERS_FILE = path.join(__dirname, '../src/data/users.json');
 const bcrypt = require('bcrypt');
 
-// Déclaration et initialisation de la variable users
-let users = readUsers();
+// Create file if it doesn't exist
+if (!fs.existsSync(USERS_FILE)) {
+  fs.writeFileSync(USERS_FILE, '[]');
+}
 
 // Lire la base de données des utilisateurs
 const readUsers = () => JSON.parse(fs.readFileSync(USERS_FILE, "utf8"));
 
-
+// Déclaration et initialisation de la variable users
+let users = readUsers();
 
 // Écrire dans la base de données des utilisateurs
 const writeUsers = (data) => fs.writeFileSync(USERS_FILE, JSON.stringify(data, null, 2));
-
-
 
 // Fonction pour l'inscription
 router.post('/register', async (req, res) => {
@@ -37,8 +38,6 @@ router.post('/register', async (req, res) => {
   res.status(200).json({ message: 'Inscription réussie' });
 });
 
-
-
 // Fonction pour la connexion
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
@@ -58,8 +57,6 @@ router.post('/login', (req, res) => {
     res.status(200).json({ message: 'Utilisateur connecté' });
   });
 });
-
-
 
 // Fonction pour ajouter un utilisateur
 const addUser = async (res) => {

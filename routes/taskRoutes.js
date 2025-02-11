@@ -1,12 +1,13 @@
 const express = require("express");
 const fs = require("fs");
+const path = require("path");
 
 const router = express.Router();
 const TASKS_FILE = "./tasks.json";
 const USERS_FILE = "./users.json";
 
 // Lire les tâches
-const readTasks = () => JSON.parse(fs.readFileSync(TASKS_FILE, "utf8"));
+const readTasks = () => JSON.parse(fs.readFileSync(path.join(__dirname, '../src/data/tasks.json'), "utf8"));
 
 // Écrire dans le fichier des tâches
 const writeTasks = (data) => fs.writeFileSync(TASKS_FILE, JSON.stringify(data, null, 2));
@@ -33,10 +34,10 @@ router.post("/tasks", (req, res) => {
 
 // Consulter les tâches d'un utilisateur
 router.get("/tasks", (req, res) => {
-    const { username } = req.query;
+    const { email } = req.query;
     const tasks = readTasks();
 
-    const userTasks = tasks.tasks.filter(task => task.username === username);
+    const userTasks = tasks.filter(task => task.userId === email);
     res.json(userTasks);
 });
 
