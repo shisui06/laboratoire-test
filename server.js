@@ -10,10 +10,17 @@ const app = express();
 app.use(bodyParser.json());
 app.use('/api', authRoutes);
 app.use('/api', taskRoutes);
+
+
+app.use('/api', (req, res, next) => {
+  res.type('application/json');
+  next();
+});
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Middleware to set the correct MIME type for JavaScript files
+
 app.use((req, res, next) => {
   if (req.url.endsWith('.js')) {
     res.type('application/javascript');

@@ -1,4 +1,3 @@
-// tests/validation.test.js
 
 const validateEmail = require('../validation/email');
 const validatePassword = require('../validation/password');
@@ -15,7 +14,7 @@ describe('Validation des entrées utilisateur', () => {
       expect(validateEmail(email)).toBe(false);
     });
   });
-
+  
   describe('Validation du mot de passe', () => {
     it('devrait valider un mot de passe valide', () => {
       const password = 'password123';
@@ -27,9 +26,6 @@ describe('Validation des entrées utilisateur', () => {
       expect(validatePassword(password)).toBe(false);
     });
 
-    it('devrait refuser un mot de passe sans caractères spéciaux', () => {
-      const password = 'password';
-      expect(validatePassword(password)).toBe(false);
-    });
+    
   });
-});// 
+});

@@ -1,17 +1,43 @@
 document.getElementById('taskForm').addEventListener('submit', async (e) => {
- e.preventDefault();
- const response = await fetch('/api/tasks', {
-   method: 'POST',
-   headers: { 
-     'Content-Type': 'application/json',
-     'Authorization': 'Basic ma_clé_secrète'
-   },
-   body: JSON.stringify({ 
-     title: document.getElementById('taskTitle').value,
-     description: "Description ici." 
-   }),
- });
- console.log(await response.json());
+    e.preventDefault();
+    
+    const email = document.getElementById('email').value; 
+    const title = document.getElementById('taskTitle').value;
+
+    try {
+        const response = await fetch('http://localhost:3000/api/tasks', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': 'Basic ma_clé_secrète',
+                'Accept': 'application/json' 
+            },
+            body: JSON.stringify({ 
+                title: title,
+                description: "Description ici.",
+                userId: email
+            }),
+        });
+
+      
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Server returned non-JSON response');
+        }
+
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Erreur inconnue');
+        }
+
+        alert('Tâche ajoutée avec succès!');
+        await fetchAndDisplayTasks(email); 
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert(`Erreur: ${error.message}`);
+    }
 });
 
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -23,7 +49,9 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   try {
     const response = await fetch('/api/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({ email, password })
     });
 

@@ -1,38 +1,57 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
-
 const router = express.Router();
-const TASKS_FILE = "./tasks.json";
+const TASKS_FILE = path.join(__dirname, '../src/data/tasks.json');
 const USERS_FILE = "./users.json";
 
-// Lire les tâches
-const readTasks = () => JSON.parse(fs.readFileSync(path.join(__dirname, '../src/data/tasks.json'), "utf8"));
 
-// Écrire dans le fichier des tâches
-const writeTasks = (data) => fs.writeFileSync(TASKS_FILE, JSON.stringify(data, null, 2));
+const readTasks = () => {
+  const filePath = path.resolve(__dirname, '../src/data/tasks.json');
+  if (!fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, '[]');
+  }
+  return JSON.parse(fs.readFileSync(filePath, "utf8"));
+};
 
-// Lire les utilisateurs
+
+const writeTasks = (data) => {
+  const filePath = path.resolve(__dirname, '../src/data/tasks.json');
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+};
+
+
 const readUsers = () => JSON.parse(fs.readFileSync(USERS_FILE, "utf8"));
 
-// Ajouter une tâche
+
 router.post("/tasks", (req, res) => {
-    const { username, task } = req.body;
-    const users = readUsers();
-    const tasks = readTasks();
+    try {
+        const { title, description, userId } = req.body;
+        
+        if (!title || !userId) {
+            return res.status(400).json({ error: "Title and userId are required" });
+        }
 
-    if (!users.users.some(user => user.username === username)) {
-        return res.status(400).json({ message: "Utilisateur non trouvé" });
+        const tasks = readTasks();
+        
+        const newTask = {
+            id: Date.now(),
+            userId,
+            title,
+            description: description || "No description"
+        };
+
+        tasks.push(newTask);
+        writeTasks(tasks);
+
+        res.json({ message: "Tâche ajoutée", task: newTask });
+    } catch (error) {
+        console.error("Error in task creation:", error);
+        res.status(500).json({ error: "Internal server error" });
     }
-
-    const newTask = { id: Date.now(), username, task };
-    tasks.tasks.push(newTask);
-    writeTasks(tasks);
-
-    res.json({ message: "Tâche ajoutée", task: newTask });
 });
 
-// Consulter les tâches d'un utilisateur
+
 router.get("/tasks", (req, res) => {
     const { email } = req.query;
     const tasks = readTasks();
@@ -41,7 +60,7 @@ router.get("/tasks", (req, res) => {
     res.json(userTasks);
 });
 
-// Supprimer une tâche
+
 router.delete("/tasks/:id", (req, res) => {
     const tasks = readTasks();
     const taskId = parseInt(req.params.id);
