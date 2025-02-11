@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Application Tâches</title>
+    <style>
+        #taskSection {
+            display: none; /* Hide task section initially */
+        }
+    </style>
 </head>
 <body>
     <h2>Connexion</h2>
@@ -12,14 +17,16 @@
         <button type="submit">Se connecter</button>
     </form>
 
-    <h2>Ajouter une tâche</h2>
-    <form id="taskForm">
-        <input type="text" id="taskTitle" placeholder="Titre de la tâche" required>
-        <button type="submit">Ajouter</button>
-    </form>
+    <div id="taskSection">
+        <h2>Ajouter une tâche</h2>
+        <form id="taskForm">
+            <input type="text" id="taskTitle" placeholder="Titre de la tâche" required>
+            <button type="submit">Ajouter</button>
+        </form>
 
-    <h2>Mes Tâches</h2>
-    <div id="taskList" class="task-list">
+        <h2>Mes Tâches</h2>
+        <div id="taskList" class="task-list">
+        </div>
     </div>
 
     <script src="app.js" type="text/javascript"></script>

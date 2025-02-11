@@ -23,17 +23,16 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   try {
     const response = await fetch('/api/login', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     });
 
     const result = await response.json();
     
     if (response.ok) {
+      document.getElementById('taskSection').style.display = 'block';
+      await fetchAndDisplayTasks(email);
       alert('Login successful!');
-      // You can redirect or update the UI here
     } else {
       alert(result.error || 'Login failed');
     }
@@ -42,3 +41,26 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     alert('An error occurred during login');
   }
 });
+
+async function fetchAndDisplayTasks(email) {
+  try {
+    const response = await fetch(`http://localhost:3000/api/tasks?email=${encodeURIComponent(email)}`, {
+      headers: {
+        'Authorization': 'Basic ma_clé_secrète'
+      }
+    });
+    
+    const tasks = await response.json();
+    const taskList = document.getElementById('taskList');
+    
+    taskList.innerHTML = tasks.map(task => `
+      <div class="task-item">
+        <h3>${task.title}</h3>
+        <p>${task.description}</p>
+      </div>
+    `).join('');
+    
+  } catch (error) {
+    console.error('Erreur:', error);
+  }
+}
